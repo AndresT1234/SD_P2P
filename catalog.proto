@@ -1,0 +1,34 @@
+syntax = "proto3";
+package catalog;
+
+
+service Catalog {
+    rpc Search(SearchRequest) returns (SearchResult);
+    rpc Download(DownloadRequest) returns (DownloadResponse);
+    rpc Upload(UploadRequest) returns (UploadResponse);
+}
+
+message SearchRequest {
+    string filename = 1;
+}
+
+message SearchResult {
+    repeated string files = 1;
+}
+
+message DownloadRequest {
+    string filename = 1;
+}
+
+message DownloadResponse {
+    string message = 1;
+}
+
+message UploadRequest {
+    string filename = 1;
+    string content = 2;
+}
+
+message UploadResponse {
+    string message = 1;
+}
