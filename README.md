@@ -72,4 +72,10 @@ Este script implementa un sistema de intercambio de archivos Peer-to-Peer (P2P) 
   "archivo": "file1.txt"
 }
 
+///para logout
+{
+  "ip": "127.0.0.1",
+  "url": "http://localhost:5001"
+}
+
 
