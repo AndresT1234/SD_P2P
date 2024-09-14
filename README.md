@@ -63,5 +63,13 @@ Este script implementa un sistema de intercambio de archivos Peer-to-Peer (P2P) 
 
 //para index
 {
+    "ip": "127.0.0.1",
     "url": "http://localhost:5001"
 }
+
+//para search
+{
+  "archivo": "file1.txt"
+}
+
+
