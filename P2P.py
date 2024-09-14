@@ -21,6 +21,7 @@ def start_grpc_server():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     catalog_pb2_grpc.add_CatalogServicer_to_server(CatalogServicer(), server)
     server.add_insecure_port(f'[::]:{gRPC_PORT}')
+    print("Server running in port 50051")
     server.start()
     logging.info(f"gRPC Server iniciado en puerto {gRPC_PORT}")
 
@@ -31,10 +32,11 @@ class CatalogServicer(catalog_pb2_grpc.CatalogServicer):
 
     def Search(self, request, context):
         archivo_buscado = request.filename
-        if archivo_buscado in self.files:
-            return catalog_pb2.SearchResult(files=[archivo_buscado])
-        else:
-            return catalog_pb2.SearchResult(files=[])
+        resultados = []
+        for peer_url, peer_info in self.peers_files.items():
+            if archivo_buscado in peer_info["files"]:
+                resultados.append(peer_url)
+        return catalog_pb2.SearchResult(files=resultados)
 
     def Download(self, request, context):
         filename = request.filename
@@ -67,31 +69,39 @@ class CatalogServicer(catalog_pb2_grpc.CatalogServicer):
             context.set_code(grpc.StatusCode.INTERNAL)
             return catalog_pb2.UploadResponse(message="Error subiendo archivo.")
         
-# Endpoint para login
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     user = data.get('user')
     password = data.get('password')
     ip = data.get('ip')
-    
-    if not user or not password or not ip:
-        return jsonify({"Error": "Faltan datos (user, password o ip)"}), 400
-    
-    url = f"http://localhost:{ip}"
-    token = secrets.token_urlsafe(16)
-    
-    if url in peers:
-        logging.info(f"Peer ya se encuentra conectado: {url}") 
+    url = data.get('url')
+    port = data.get('port')
+    files = data.get('archivos')
+
+    # Validation of data
+    if not user or not password or not url or not port or not files or not ip:
+        return jsonify({"Error": "Faltan datos (user, password, url, port o files)"}), 400
+
+    # Construction of the full URL
+    full_url = f"{url}:{port}"
+
+    # Generate token before creating peer entry
+    token = secrets.token_urlsafe(6)
+
+    peers[full_url] = {"user": user, "token": token, "files": [files]}
+
+    if full_url in peers:
+        logging.info(f"Peer ya se encuentra conectado: {full_url}")
         return jsonify({"message": "Peer ya se encuentra conectado"}), 400
     else:
-        peers[url] = {"user": user, "token": token, "files": []}
-        logging.info(f"Peer conectado correctamente en: {url}")
+        logging.info(f"Peer conectado correctamente en: {full_url}")
         return jsonify({"estado": "OK", "token": token}), 200
 
 # Endpoint para index
 @app.route('/index', methods=['POST'])
 def index():
+
     data = request.get_json()
     peer_url = data.get('url')
 
@@ -100,13 +110,14 @@ def index():
     
     peer_info = peers.get(peer_url)
     
-    if peer_info:
-        return jsonify({
+    try:
+        peer_info = peers[peer_url]
+        response = {
             "nombre": peer_info.get("user"),
-            "url": peer_url,
             "files": peer_info.get("files", [])
-        }), 200
-    else:
+        }
+        return jsonify(response), 200
+    except KeyError:
         return jsonify({"error": "Peer no encontrado"}), 404
 
 # Endpoint para search
@@ -118,10 +129,10 @@ def search():
     if not archivo_buscado:
         return jsonify({"error": "Falta el nombre del archivo a buscar"}), 400
     
-    for url, info in peers.items():
+    for ip, info in peers.items():
         archivos = info.get("files", [])
-        if archivo_buscado in archivos:
-            return jsonify({"url": url}), 200
+        if archivo_buscado in archivos.split(", "):
+            return jsonify({"ip": ip}), 200
     
     return jsonify({"mensaje": "Archivo no encontrado"}), 404
 
@@ -129,15 +140,15 @@ def search():
 @app.route('/logout', methods=['POST'])
 def logout():
     data = request.get_json()
-    url = data.get('url')
+    ip = data.get('ip')
     
-    if not url:
+    if not ip:
         return jsonify({"error": "Falta la url del peer"}), 400
 
-    if url in peers:
-        del peers[url]
-        logging.info(f"Peer desconectado: {url}")
-        return jsonify({"mensaje": f"Peer {url} desconectado correctamente."}), 200
+    if ip in peers:
+        del peers[ip]
+        logging.info(f"Peer desconectado: {ip}")
+        return jsonify({"mensaje": f"Peer {ip} desconectado correctamente."}), 200
     else:
         return jsonify({"error": "URL no encontrada"}), 404
 

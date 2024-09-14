@@ -53,12 +53,15 @@ Este script implementa un sistema de intercambio de archivos Peer-to-Peer (P2P) 
 
 //para login
 {
-  "user": "peer1",
-  "password": "alo12345",
-  "ip": "5001"
+    "user": "peer1",
+    "password": "per1234",
+    "ip": "127.0.0.1",
+    "url": "http://localhost",
+    "port": "5001",
+    "archivos": "file1.txt,file2.txt,file3.txt"
 }
 
 //para index
 {
-  "url": "http://localhost:5001"
+    "url": "http://localhost:5001"
 }
