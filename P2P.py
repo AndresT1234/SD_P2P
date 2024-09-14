@@ -85,15 +85,12 @@ def login():
     full_url = f"{url}:{port}"
     token = secrets.token_urlsafe(6)
 
-    # Crear una clave única combinando full_url e ip
     peer_key = (full_url, ip)
 
-    # Verificar si el peer ya existe usando la clave única
     if peer_key in peers:
         logging.info(f"Peer ya se encuentra conectado: {full_url}")
         return jsonify({"message": "Peer ya se encuentra conectado"}), 400
-
-    # Agregar el peer al diccionario usando la clave única
+    
     peers[peer_key] = {"user": user, "token": token, "files": [files]}
 
     logging.info(f"Peer conectado correctamente en: {full_url}")
