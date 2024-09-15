@@ -19,6 +19,15 @@ Antes de ejecutar el sistema, es necesario instalar las dependencias y compilar 
    pip install grpcio-tools
    ```
 
+   \.grpc_serv -> "ubicado enesta carpeta realizo las siguientes instalaciones"
+   - pip install pipenv
+   - pipenv install grpcio-tools grpcio googleapis-common-protos
+   - python -m grpc_tools.protoc -I..\proto --python_out=. --grpc_python_out=. catalog.proto
+   - pipenv shell "para arrancar el etorno virtul"
+   - python .\servergrpc.py "para ejecutar el servidor"
+
+   
+
 2. Compilar el archivo `catalog.proto` para generar los archivos Python necesarios:
    ```bash
    python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. catalog.proto
