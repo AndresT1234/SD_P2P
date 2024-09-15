@@ -34,39 +34,17 @@ class CatalogStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Search = channel.unary_unary(
-                '/catalog.Catalog/Search',
-                request_serializer=catalog__pb2.SearchRequest.SerializeToString,
-                response_deserializer=catalog__pb2.SearchResult.FromString,
-                _registered_method=True)
         self.Download = channel.unary_unary(
                 '/catalog.Catalog/Download',
                 request_serializer=catalog__pb2.DownloadRequest.SerializeToString,
                 response_deserializer=catalog__pb2.DownloadResponse.FromString,
-                _registered_method=True)
-        self.Upload = channel.unary_unary(
-                '/catalog.Catalog/Upload',
-                request_serializer=catalog__pb2.UploadRequest.SerializeToString,
-                response_deserializer=catalog__pb2.UploadResponse.FromString,
                 _registered_method=True)
 
 
 class CatalogServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Search(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def Download(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def Upload(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -75,20 +53,10 @@ class CatalogServicer(object):
 
 def add_CatalogServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Search': grpc.unary_unary_rpc_method_handler(
-                    servicer.Search,
-                    request_deserializer=catalog__pb2.SearchRequest.FromString,
-                    response_serializer=catalog__pb2.SearchResult.SerializeToString,
-            ),
             'Download': grpc.unary_unary_rpc_method_handler(
                     servicer.Download,
                     request_deserializer=catalog__pb2.DownloadRequest.FromString,
                     response_serializer=catalog__pb2.DownloadResponse.SerializeToString,
-            ),
-            'Upload': grpc.unary_unary_rpc_method_handler(
-                    servicer.Upload,
-                    request_deserializer=catalog__pb2.UploadRequest.FromString,
-                    response_serializer=catalog__pb2.UploadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -100,33 +68,6 @@ def add_CatalogServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class Catalog(object):
     """Missing associated documentation comment in .proto file."""
-
-    @staticmethod
-    def Search(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/catalog.Catalog/Search',
-            catalog__pb2.SearchRequest.SerializeToString,
-            catalog__pb2.SearchResult.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
 
     @staticmethod
     def Download(request,
@@ -145,33 +86,6 @@ class Catalog(object):
             '/catalog.Catalog/Download',
             catalog__pb2.DownloadRequest.SerializeToString,
             catalog__pb2.DownloadResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def Upload(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/catalog.Catalog/Upload',
-            catalog__pb2.UploadRequest.SerializeToString,
-            catalog__pb2.UploadResponse.FromString,
             options,
             channel_credentials,
             insecure,

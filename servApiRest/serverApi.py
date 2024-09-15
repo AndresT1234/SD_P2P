@@ -1,6 +1,8 @@
 import logging
 from flask import Flask, request, jsonify
 import secrets
+import grpc
+import catalog_pb2, catalog_pb2_grpc
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -96,8 +98,31 @@ def logout():
         return jsonify({"mensaje": f"Peer {peer_key} desconectado correctamente."}), 200
     else:
         return jsonify({"error": "Peer no encontrado"}), 404
+    
+# Endpoint grpc para descargar
+@app.route('/descargar', methods=['GET'])
+def descargar():
+    data = request.get_json()
+    archivo_a_descargar = data.get('archivo')
+    url_peer = data.get('url')
 
+    if url_peer not in peers:
+        return jsonify({"error": "Peer no encontrado"}), 404
 
+    peer_port = url_peer.split(":")[2]
+    with grpc.insecure_channel(f'{url_peer.split(":")[1]}:{peer_port}') as channel:
+        stub = catalog_pb2_grpc.CatalogStub(channel)
+        try:
+            response = stub.Download(catalog_pb2.DownloadRequest(filename=archivo_a_descargar))
+            with open(f'./descargado_{archivo_a_descargar}', 'wb') as f:
+                f.write(response.file_data)
+            logging.info(f"Descarga exitosa: {archivo_a_descargar}")
+            return jsonify({"resultado": 1}), 200
+        except grpc.RpcError as e:
+            logging.error(f"Error al descargar {archivo_a_descargar}: {str(e)}")
+            return jsonify({"resultado": 0}), 500
+        
 if __name__ == "__main__":
     app.run(port=5000, debug=True) 
+
 
