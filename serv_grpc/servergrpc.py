@@ -2,7 +2,8 @@ from concurrent import futures
 import logging
 import grpclib
 import grpc
-import catalog_pb2, catalog_pb2_grpc
+
+from proto import catalog_pb2_grpc, catalog_pb2
 
 #servicios gRPC
 class CatalogServicer(catalog_pb2_grpc.CatalogServicer):  
@@ -43,7 +44,8 @@ def download_file(filename, peer_url):
 
 if __name__ == "__main__":
     #servidor gRPC
-    start_grpc_server()   
+    start_grpc_server()
+    download_file("archivo1.txt", "localhost:50051")  
 
 
 
