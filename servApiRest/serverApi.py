@@ -2,7 +2,7 @@ import logging
 from flask import Flask, request, jsonify
 import secrets
 import grpc
-import catalog_pb2, catalog_pb2_grpc
+from proto import catalog_pb2_grpc, catalog_pb2
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,16 +14,14 @@ def login():
     user = data.get('user')
     password = data.get('password')
     ip = data.get('ip')
-    url = data.get('url')
     port = data.get('port')
     files = data.get('archivos')
 
-    if not user or not password or not url or not port or not files or not ip:
+    if not user or not password or not port or not files or not ip:
         return jsonify({"Error": "Faltan datos (user, password, url, port o files)"}), 400
 
-    full_url = f"{url}:{port}"
+    full_url = f"http.//localhost:{port}"
     token = secrets.token_urlsafe(6)
-
     peer_key = (full_url, ip)
 
     if peer_key in peers:
@@ -46,7 +44,6 @@ def index():
         return jsonify({"error": "Faltan datos (ip o url)"}), 400
 
     peer_key = (url, ip)
-
     peer_info = peers.get(peer_key)
 
     if peer_info:
@@ -100,27 +97,39 @@ def logout():
         return jsonify({"error": "Peer no encontrado"}), 404
     
 # Endpoint grpc para descargar
-@app.route('/descargar', methods=['GET'])
+@app.route('/descargar', methods=['POST'])
 def descargar():
     data = request.get_json()
     archivo_a_descargar = data.get('archivo')
     url_peer = data.get('url')
 
-    if url_peer not in peers:
+    if not archivo_a_descargar or not url_peer:
+        return jsonify({"error": "Faltan datos (archivo o url)"}), 400
+
+    peer_key = (url_peer, data.get('ip'))
+
+    if peer_key not in peers:
         return jsonify({"error": "Peer no encontrado"}), 404
 
     peer_port = url_peer.split(":")[2]
-    with grpc.insecure_channel(f'{url_peer.split(":")[1]}:{peer_port}') as channel:
+    peer_ip = url_peer.split(":")[1]
+
+    # Conectar a gRPC server del peer
+    with grpc.insecure_channel(f'{peer_ip}:{peer_port}') as channel:
         stub = catalog_pb2_grpc.CatalogStub(channel)
         try:
             response = stub.Download(catalog_pb2.DownloadRequest(filename=archivo_a_descargar))
-            with open(f'./descargado_{archivo_a_descargar}', 'wb') as f:
-                f.write(response.file_data)
-            logging.info(f"Descarga exitosa: {archivo_a_descargar}")
-            return jsonify({"resultado": 1}), 200
+            if response.file_data:
+                file_name = f'descargado_{archivo_a_descargar}'
+                with open(file_name, 'wb') as f:
+                    f.write(response.file_data)
+                logging.info(f"Archivo descargado exitosamente: {archivo_a_descargar}")
+                return jsonify({"estado": "Descargado", "archivo": file_name}), 200
+            else:
+                return jsonify({"error": "Archivo no encontrado"}), 404
         except grpc.RpcError as e:
             logging.error(f"Error al descargar {archivo_a_descargar}: {str(e)}")
-            return jsonify({"resultado": 0}), 500
+            return jsonify({"error": "Error en la descarga"}), 500
         
 if __name__ == "__main__":
     app.run(port=5000, debug=True) 
