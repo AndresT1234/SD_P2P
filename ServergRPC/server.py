@@ -1,9 +1,9 @@
 from concurrent import futures
 import logging
-import grpclib
+from flask import json
 import grpc
-
-from proto import catalog_pb2_grpc, catalog_pb2
+import catalog_pb2
+import catalog_pb2_grpc
 
 #servicios gRPC
 class CatalogServicer(catalog_pb2_grpc.CatalogServicer):  
@@ -17,21 +17,33 @@ class CatalogServicer(catalog_pb2_grpc.CatalogServicer):
             context.set_details(f"Archivo {filename} no encontrado.")
             context.set_code(grpc.StatusCode.NOT_FOUND)
             return catalog_pb2.DownloadResponse()
-    
+        
 #servidor gRPC  
-def start_grpc_server():
+def server():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    catalog_pb2_grpc.add_CatalogServicer_to_server(CatalogServicer(), server)
+    catalog_pb2_grpc.add_CatalogServicer_to_server(catalog_pb2_grpc.CatalogServicer(), server)
     server.add_insecure_port(f'[::]:{50051}')
     print("gRPC server iniciado en el puerto 50051")
     server.start()
     logging.info(f"gRPC Server iniciado en puerto {50051}")
     server.wait_for_termination() 
-    
+
+#guardar peers
+def guardarpeer(peer_info):
+    config_file = 'config.json'
+    try:
+        with open(config_file, 'r') as f:
+            config_data = json.load(f)
+    except FileNotFoundError:
+        config_data = {}
+
+    if 'peers' not in config_data:
+        config_data['peers'] = []
+
+        config_data['peers'].append(peer_info)
+
+    with open(config_file, 'w') as f:
+        json.dump(config_data, f, indent=4)
 
 if __name__ == "__main__":
-    #servidor gRPC
-    start_grpc_server()
-
-
-
+    server()

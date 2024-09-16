@@ -28,6 +28,13 @@ Antes de ejecutar el sistema, es necesario instalar las dependencias y compilar 
    - `catalog_pb2.py`: Define los mensajes gRPC.
    - `catalog_pb2_grpc.py`: Define las clases de los servicios gRPC.
 
+3. ejecutar servidores en entornos virtuales
+    - pip install pipenv    
+    - pipenv install grpcio-tools grpcio googleapis-common-protos
+    - pipenv shell  
+    - pip install flask
+     
+
 ## Estructura del Proyecto
 
 El proyecto utiliza los siguientes módulos y dependencias:
@@ -74,11 +81,10 @@ El proyecto utiliza los siguientes módulos y dependencias:
 POST /login
 {
     "user": "peer1",
-    "password": "peer1234",
+    "password": "peer11",
     "ip": "127.0.0.1",
-    "url": "http://localhost",
-    "port": "5001",
-    "archivos": "file1.txt,file2.txt,file3.txt"
+    "port": 5001,
+    "archivos": ["file1.txt,file2.txt,file3.txt"]
 }
 ```
 
@@ -87,7 +93,7 @@ POST /login
 POST /index
 {
     "ip": "127.0.0.1",
-    "url": "http://localhost:5001"
+    "url": "http://127.0.0.1:5001"
 }
 ```
 
@@ -104,7 +110,7 @@ POST /search
 POST /logout
 {
     "ip": "127.0.0.1",
-    "url": "http://localhost:5001"
+    "url": "http://127.0.0.1:5001"
 }
 ```
 

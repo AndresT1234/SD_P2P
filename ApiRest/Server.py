@@ -18,7 +18,7 @@ def login():
     if not user or not password or not port or not files or not ip:
         return jsonify({"Error": "Faltan datos (user, password, url, port o files)"}), 400
 
-    full_url = f"localhost:{port}"
+    full_url = f"http://{ip}:{port}"
     token = secrets.token_urlsafe(6)
     peer_key = (full_url, ip)
 
@@ -30,6 +30,7 @@ def login():
 
     logging.info(f"Peer conectado correctamente en: {full_url}")
     return jsonify({"estado": "OK", "token": token}), 200
+
 
 # Endpoint para index
 @app.route('/index', methods=['POST'])
