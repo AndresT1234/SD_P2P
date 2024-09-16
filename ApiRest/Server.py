@@ -28,7 +28,8 @@ def login():
     
     peers[peer_key] = {"user": user, "token": token, "files": [files]}
 
-    logging.info(f"Peer conectado correctamente en: {full_url}")
+    logging.info(f"Peer conectado correctamente en: {full_url}\n")
+    logging.info(f"Peers conectados: {peers}\n")
     return jsonify({"estado": "OK", "token": token}), 200
 
 
