@@ -1,11 +1,7 @@
 import requests
 import json
 
-DOWNLOAD_PATH = "../files" 
-
 class Peer1:
-
-    API_URL = "http://127.0.0.1:5000"
 
     def __init__(self):
 
@@ -23,7 +19,7 @@ class Peer1:
         if not user or not password or not port or not files or not ip:
             return {"Error": "Faltan datos (user, password, url, port o files)"}, 400
 
-        full_url = f"http://127.0.0.1:5000/login"
+        full_url = f"http://localhost:5000/login"
         peer_key = (full_url, ip)
 
         if peer_key in self.peers:
@@ -45,7 +41,7 @@ class Peer1:
         if not ip or not url:
             return {"error": "Faltan datos (ip o url)"}, 400
 
-        response = requests.post("http://127.0.0.1:5000/index", json={"ip": ip, "url": url})
+        response = requests.post("http://localhost:5000/index", json={"ip": ip, "url": url})
 
         if response.status_code == 200:
             response = response.json()
@@ -57,7 +53,7 @@ class Peer1:
         if not archivo_buscado:
             return {"error": "Falta el nombre del archivo a buscar"}, 400
 
-        response = requests.post("http://127.0.0.1:5000/search", json={"archivo": archivo_buscado})
+        response = requests.post("http://localhost:5000/search", json={"archivo": archivo_buscado})
 
         if response.status_code == 200:
             response = response.json()
@@ -69,7 +65,7 @@ class Peer1:
         if not ip or not url:
             return {"error": "Faltan datos (ip o url)"}, 400
 
-        response = requests.post("http://127.0.0.1:5000/logout", json={"ip": ip, "url": url})
+        response = requests.post("http://localhost:5000/logout", json={"ip": ip, "url": url})
 
         if response.status_code == 200:
             response = response.json()
@@ -83,11 +79,13 @@ def main():
     result = peer.login(peer.user, peer.password, peer.ip, peer.port, peer.files)
     result1 = peer.index(peer.ip, "http://127.0.0.1:5001")
     result2 = peer.search("file1.txt")
-    result3 = peer.logout(peer.ip, "http://127.0.0.1:5001")
+    #result3 = peer.logout(peer.ip, "http://127.0.0.1:5001")
     print(result)
     print(result1)
     print(result2)
-    print(result3)
+    #print(result3)
 
 if __name__ == "__main__":
     main()
+
+    

@@ -2,8 +2,8 @@ from concurrent import futures
 import logging
 from flask import json
 import grpc
-import catalog_pb2
-import catalog_pb2_grpc
+import proto.catalog_pb2 as catalog_pb2
+import proto.catalog_pb2_grpc as catalog_pb2_grpc
 
 #servicios gRPC
 class CatalogServicer(catalog_pb2_grpc.CatalogServicer):  

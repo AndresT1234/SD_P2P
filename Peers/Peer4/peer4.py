@@ -1,7 +1,7 @@
 import requests
 import json
 
-class Peer2:
+class Peer4:
 
     def __init__(self):
 
@@ -75,15 +75,15 @@ class Peer2:
         
 
 def main():
-    peer = Peer2()
+    peer = Peer4()
     result = peer.login(peer.user, peer.password, peer.ip, peer.port, peer.files)
-    result1 = peer.index(peer.ip, "http://127.0.0.2:5002")
+    result1 = peer.index(peer.ip, "http://127.0.0.4:5004")
     result2 = peer.search("file1.txt")
-    #result3 = peer.logout(peer.ip, "http://127.0.0.2:5002")
+    result3 = peer.logout(peer.ip, "http://127.0.0.4:5004")
     print(result)
     print(result1)
     print(result2)
-    #print(result3)
+    print(result3)
 
 if __name__ == "__main__":
     main()
