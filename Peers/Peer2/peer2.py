@@ -1,5 +1,6 @@
 import requests
 import json
+import sys
 
 class Peer2:
     def __init__(self):
@@ -81,16 +82,38 @@ class Peer2:
 
 def main():
     peer = Peer2()
-    result = peer.login(peer.user, peer.password, peer.ip, peer.port, peer.files, peer.api_url)
-    result1 = peer.index(peer.ip, "http://127.0.0.1:5001", peer.api_url)
-    result2 = peer.search("file1.txt", peer.api_url)
-    #result3 = peer.logout(peer.ip, "http://127.0.0.1:5001")
-    print(result)
-    print(result1)
-    print(result2)
-    #print(result3)
+
+    #Verificamos que se haya pasado un parametro
+    if len(sys.argv) < 1:
+        print("Uso: python script.py <funcion>")
+        sys.exit(1)
+
+    #Obtenemos el primer parametro
+    parametro1 = sys.argv[1]
+
+    #Ejecutamos la funcion correspondiente
+    if parametro1 == "/login":
+        login_response = peer.login(peer.user, peer.password, peer.ip, peer.port, peer.files, peer.api_url)
+        print("Login response:", login_response)
+
+    elif parametro1 == "/index":
+        index_response = peer.index(peer.ip, f"http://{peer.ip}:{peer.port}", peer.api_url)
+        print("Index response:", index_response)
+    
+    elif parametro1 == "/logout":
+        logout_response = peer.logout(peer.ip, f"http://{peer.ip}:{peer.port}", peer.api_url)
+        print("Logout response:", logout_response)
+    
+    elif parametro1 == "/search":
+        #Obtenemos el segundo parametro
+        parametro2 = sys.argv[2]
+        search_response = peer.search(parametro2, peer.api_url)
+        print("Search response:", search_response)
+
+    #En caso de que el comando no exista
+    else:
+        print("Error en el comando")
+
 
 if __name__ == "__main__":
     main()
-
-    
