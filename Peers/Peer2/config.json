@@ -4,5 +4,6 @@
     "ip": "127.0.0.2",
     "port": "5002",
     "archivos": "file1.txt,fil2.txt,f22.txt",
-    "api_url": "http://localhost:5000"
+    "api_url": "http://localhost:5000",
+    "files_path": "files/"
 }

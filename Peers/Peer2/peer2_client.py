@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import os
 
 class Peer2:
     def __init__(self):
@@ -11,7 +12,7 @@ class Peer2:
             self.password = data['password']
             self.ip = data['ip']
             self.port = data['port']
-            self.files = data['archivos']
+            self.files = os.listdir(data['files_path'])
             self.api_url = data['api_url']
             self.peers = {}
             

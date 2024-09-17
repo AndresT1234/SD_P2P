@@ -1,10 +1,14 @@
 import grpc
 from concurrent import futures
-import peer_pb2
-import peer_pb2_grpc
 import os
+import sys
 
-FILES_PATH = "../files/"  # Directorio donde se almacenan los archivos
+# Agregar el directorio padre al path para importar los módulos de gRPC
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from gRPC import peer_pb2, peer_pb2_grpc
+
+FILES_PATH = "files/"  # Directorio donde se almacenan los archivos
 
 # Clase que implementa los métodos de PeerService
 class PeerService(peer_pb2_grpc.PeerServiceServicer):
@@ -36,9 +40,9 @@ class PeerService(peer_pb2_grpc.PeerServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     peer_pb2_grpc.add_PeerServiceServicer_to_server(PeerService(), server)
-    server.add_insecure_port('[::]:50052')  # Escuchar en el puerto 50051
+    server.add_insecure_port('[::]:5002')  # Escuchar en el puerto 5002
     server.start()
-    print("gRPC Peer Server ejecutandose en el puerto 50052...")
+    print("gRPC Peer Server ejecutandose en el puerto 5002...")
     print(f"Archivos listos desde: {os.path.abspath(FILES_PATH)}")
     server.wait_for_termination()
 

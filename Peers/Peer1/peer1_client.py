@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import os
 
 class Peer1:
     def __init__(self):
@@ -11,12 +12,11 @@ class Peer1:
             self.password = data['password']
             self.ip = data['ip']
             self.port = data['port']
-            self.files = data['archivos']
+            self.files = os.listdir(data['files_path'])
             self.api_url = data['api_url']
             self.peers = {}
             
     
-
     def login(self, user, password, ip, port, files, api_url):
         if not user or not password or not port or not files or not ip or not api_url:
             return {"Error": "Faltan datos (user, password, url, port, files o api_url)"}, 400
@@ -79,6 +79,8 @@ class Peer1:
         else:
             return {"error": "Peer no encontrado"}, 404
         
+
+
 
 def main():
     peer = Peer1()

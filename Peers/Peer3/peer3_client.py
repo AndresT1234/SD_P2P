@@ -16,7 +16,6 @@ class Peer3:
             self.peers = {}
             
     
-
     def login(self, user, password, ip, port, files, api_url):
         if not user or not password or not port or not files or not ip or not api_url:
             return {"Error": "Faltan datos (user, password, url, port, files o api_url)"}, 400

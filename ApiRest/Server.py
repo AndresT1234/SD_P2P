@@ -68,7 +68,8 @@ def search():
     for (url, ip), info in peers.items():
         archivos = info.get("files", [])
         for archivo in archivos:
-            archivos_list = archivo.split(',')
+            files_string = ','.join(archivo)
+            archivos_list = files_string.split(',')
             if archivo_buscado in archivos_list:
                 resultados.append({"url": url, "ip": ip, "nombre": info.get("user")})
     
