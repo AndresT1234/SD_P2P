@@ -97,6 +97,28 @@ def logout():
     else:
         return jsonify({"error": "Peer no encontrado"}), 404
     
+
+@app.route('/loadfiles', methods=['POST'])
+def loadfiles():
+    data = request.get_json()
+    ip = data.get('ip')
+    port = data.get('port')
+    files = data.get('archivos')
+
+    if not port or not files or not ip:
+        return jsonify({"Error": "Faltan datos (ip, port o files)"}), 400
+
+    full_url = f"http://{ip}:{port}"
+    peer_key = (full_url, ip)
+
+    if peer_key not in peers:
+        logging.info(f"Peer no está conectado: {full_url}")
+        return jsonify({"message": "Peer no está conectado"}), 400
+
+    peers[peer_key] = {"files": [files]}
+
+    return jsonify({"estado": "OK"}), 200
+    
         
 if __name__ == "__main__":
     app.run(host= 'localhost', port=5000, debug=True)

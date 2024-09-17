@@ -102,8 +102,29 @@ def download_file(peer_address, filename):
             for chunk in response:
                 f.write(chunk.content)
         print(f"Archivo {filename} descargado exitosamente.")
+
+        # Cargar los archivos en el servidor
+        responseLoadFiles = load_files()
+        print(responseLoadFiles)
     except peer_pb2_grpc.grpc.RpcError as e:
         print(f"Error al descargar el archivo: {e.details()}")
+
+
+def load_files():
+    with open("config.json") as f:
+        data = json.load(f)
+        files = os.listdir(data['files_path'])
+        ip = data['ip']
+        port = data['port']
+        api_url = data['api_url']
+    
+    response = requests.post(f"{api_url}/loadfiles", json={"ip": ip, "port": port, "archivos": files})
+        
+    if response.status_code == 200:
+            return {"estado": "OK", "message": "archivos cargados correctamente"}, 200
+    else:
+        return {"Error": "Falló cargando los archivos"}, response.status_code
+        
 
 
 def main():
