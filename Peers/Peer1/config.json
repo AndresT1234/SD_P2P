@@ -3,5 +3,6 @@
     "password": "peer11",
     "ip": "127.0.0.1",
     "port": 5001,
-    "archivos": "file1.txt,file2.txt,file3.txt"
+    "archivos": "file1.txt,file2.txt,file3.txt",
+    "api_url": "http://localhost:5000"
 }
