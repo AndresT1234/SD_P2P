@@ -1,8 +1,16 @@
 import requests
 import json
 import sys
+import os
 
-class Peer3:
+# Agregar el directorio padre al path para importar los módulos de gRPC
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from gRPC import peer_pb2, peer_pb2_grpc
+
+DOWNLOAD_PATH = "files/"  # Directorio donde se almacenan los archivos descargados
+
+class Peer2:
     def __init__(self):
         with open("config.json") as f:
             data = json.load(f)
@@ -11,7 +19,7 @@ class Peer3:
             self.password = data['password']
             self.ip = data['ip']
             self.port = data['port']
-            self.files = data['archivos']
+            self.files = os.listdir(data['files_path'])
             self.api_url = data['api_url']
             self.peers = {}
             
@@ -20,22 +28,9 @@ class Peer3:
         if not user or not password or not port or not files or not ip or not api_url:
             return {"Error": "Faltan datos (user, password, url, port, files o api_url)"}, 400
 
-        peer_key = (api_url, ip)
-
-        if peer_key in self.peers:
-            return {"message": "Peer ya se encuentra conectado"}, 400
-
-        response = requests.post(f"{api_url}/login", json={"user": user, "password": password, "ip": ip, "port": port, "archivos": files})
-
-        if response.status_code == 200:
-            token = response.json().get('token')
-            if token:
-                self.peers[peer_key] = {"user": user, "token": token, "files": [files]}
-                return {"estado": "OK", "token": token}, 200
-            else:
-                return {"Error": "No se recibió token en la respuesta"}, 400
         else:
-            return {"Error": "Falló la conexión con el servidor"}, response.status_code
+            response = requests.post(f"{api_url}/login", json={"user": user, "password": password, "ip": ip, "port": port, "archivos": files})
+            return response.json(), response.status_code
         
 
     def index(self, ip, url, api_url):
@@ -79,8 +74,47 @@ class Peer3:
             return {"error": "Peer no encontrado"}, 404
         
 
+def download_file(peer_address, filename):
+    # Conectar al peer en la dirección indicada (IP:puerto)
+    channel = peer_pb2_grpc.grpc.insecure_channel(peer_address)
+    stub = peer_pb2_grpc.PeerServiceStub(channel)
+    
+    # Crear una solicitud de archivo
+    request = peer_pb2.FileRequest(filename=filename)
+    
+    # Realizar la descarga del archivo en chunks
+    try:
+        response = stub.DownloadFile(request)
+        with open(os.path.join(DOWNLOAD_PATH, f"downloaded_{filename}"), 'wb') as f:
+            for chunk in response:
+                f.write(chunk.content)
+        print(f"Archivo {filename} descargado exitosamente.")
+
+        # Cargar los archivos en el servidor
+        responseLoadFiles = load_files()
+        print(responseLoadFiles)
+    except peer_pb2_grpc.grpc.RpcError as e:
+        print(f"Error al descargar el archivo: {e.details()}")
+
+
+def load_files():
+    with open("config.json") as f:
+        data = json.load(f)
+        files = os.listdir(data['files_path'])
+        ip = data['ip']
+        port = data['port']
+        api_url = data['api_url']
+    
+    response = requests.post(f"{api_url}/loadfiles", json={"ip": ip, "port": port, "archivos": files})
+        
+    if response.status_code == 200:
+            return {"estado": "OK", "message": "archivos cargados correctamente"}, 200
+    else:
+        return {"Error": "Falló cargando los archivos"}, response.status_code
+
+
 def main():
-    peer = Peer3()
+    peer = Peer2()
 
     #Verificamos que se haya pasado un parametro
     if len(sys.argv) < 1:
@@ -108,6 +142,13 @@ def main():
         parametro2 = sys.argv[2]
         search_response = peer.search(parametro2, peer.api_url)
         print("Search response:", search_response)
+
+    elif parametro1 == "/download":
+        #Obtenemos el segundo parametro
+        peer_address = sys.argv[2] #Direccion del peer al que conectarse
+        filename = sys.argv[3] #Archivo a descargar
+
+        download_file(peer_address, filename)
 
     #En caso de que el comando no exista
     else:
