@@ -28,22 +28,9 @@ class Peer2:
         if not user or not password or not port or not files or not ip or not api_url:
             return {"Error": "Faltan datos (user, password, url, port, files o api_url)"}, 400
 
-        peer_key = (api_url, ip)
-
-        if peer_key in self.peers:
-            return {"message": "Peer ya se encuentra conectado"}, 400
-
-        response = requests.post(f"{api_url}/login", json={"user": user, "password": password, "ip": ip, "port": port, "archivos": files})
-
-        if response.status_code == 200:
-            token = response.json().get('token')
-            if token:
-                self.peers[peer_key] = {"user": user, "token": token, "files": [files]}
-                return {"estado": "OK", "token": token}, 200
-            else:
-                return {"Error": "No se recibió token en la respuesta"}, 400
         else:
-            return {"Error": "Falló la conexión con el servidor"}, response.status_code
+            response = requests.post(f"{api_url}/login", json={"user": user, "password": password, "ip": ip, "port": port, "archivos": files})
+            return response.json(), response.status_code
         
 
     def index(self, ip, url, api_url):

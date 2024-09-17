@@ -3,6 +3,7 @@
     "password": "peer4444",
     "ip": "127.0.0.4",
     "port": "5004",
-    "archivos": "file1.txt,fi44.txt,f44.txt",
-    "api_url": "http://localhost:5000"
+    "archivos": "fil.txt,fe22.txt,fil23.txt",
+    "api_url": "http://localhost:5000",
+    "files_path": "files/"
 }
