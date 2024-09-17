@@ -3,6 +3,13 @@ import json
 import sys
 import os
 
+# Agregar el directorio padre al path para importar los módulos de gRPC
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from gRPC import peer_pb2, peer_pb2_grpc
+
+DOWNLOAD_PATH = "files/"  # Directorio donde se almacenan los archivos descargados
+
 class Peer2:
     def __init__(self):
         with open("config.json") as f:
@@ -17,7 +24,6 @@ class Peer2:
             self.peers = {}
             
     
-
     def login(self, user, password, ip, port, files, api_url):
         if not user or not password or not port or not files or not ip or not api_url:
             return {"Error": "Faltan datos (user, password, url, port, files o api_url)"}, 400
@@ -81,6 +87,24 @@ class Peer2:
             return {"error": "Peer no encontrado"}, 404
         
 
+def download_file(peer_address, filename):
+    # Conectar al peer en la dirección indicada (IP:puerto)
+    channel = peer_pb2_grpc.grpc.insecure_channel(peer_address)
+    stub = peer_pb2_grpc.PeerServiceStub(channel)
+    
+    # Crear una solicitud de archivo
+    request = peer_pb2.FileRequest(filename=filename)
+    
+    # Realizar la descarga del archivo en chunks
+    try:
+        response = stub.DownloadFile(request)
+        with open(os.path.join(DOWNLOAD_PATH, f"downloaded_{filename}"), 'wb') as f:
+            for chunk in response:
+                f.write(chunk.content)
+        print(f"Archivo {filename} descargado exitosamente.")
+    except peer_pb2_grpc.grpc.RpcError as e:
+        print(f"Error al descargar el archivo: {e.details()}")
+
 def main():
     peer = Peer2()
 
@@ -110,6 +134,13 @@ def main():
         parametro2 = sys.argv[2]
         search_response = peer.search(parametro2, peer.api_url)
         print("Search response:", search_response)
+
+    elif parametro1 == "/download":
+        #Obtenemos el segundo parametro
+        peer_address = sys.argv[2] #Direccion del peer al que conectarse
+        filename = sys.argv[3] #Archivo a descargar
+
+        download_file(peer_address, filename)
 
     #En caso de que el comando no exista
     else:
