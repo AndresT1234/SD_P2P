@@ -10,7 +10,7 @@ from gRPC import peer_pb2, peer_pb2_grpc
 
 DOWNLOAD_PATH = "files/"  # Directorio donde se almacenan los archivos descargados
 
-class Peer2:
+class Peer3:
     def __init__(self):
         with open("config.json") as f:
             data = json.load(f)
@@ -114,7 +114,7 @@ def load_files():
 
 
 def main():
-    peer = Peer2()
+    peer = Peer3()
 
     #Verificamos que se haya pasado un parametro
     if len(sys.argv) < 1:
