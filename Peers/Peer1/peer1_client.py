@@ -21,7 +21,6 @@ class Peer1:
             self.port = data['port']
             self.files = os.listdir(data['files_path'])
             self.api_url = data['api_url']
-            self.peers = {}
             
     
     def login(self, user, password, ip, port, files, api_url):
