@@ -8,9 +8,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from gRPC import peer_pb2, peer_pb2_grpc
 
-DOWNLOAD_PATH = "files/"  # Directorio donde se almacenan los archivos descargados
 
 class Peer1:
+    DOWNLOAD_PATH = "" # Directorio donde se almacenan los archivos descargados
+
     def __init__(self):
         with open("config.json") as f:
             data = json.load(f)
@@ -20,6 +21,7 @@ class Peer1:
             self.ip = data['ip']
             self.port = data['port']
             self.files = os.listdir(data['files_path'])
+            Peer1.DOWNLOAD_PATH = data['files_path_download'] 
             self.api_url = data['api_url']
             
     
@@ -84,7 +86,7 @@ def download_file(peer_address, filename):
     # Realizar la descarga del archivo en chunks
     try:
         response = stub.DownloadFile(request)
-        with open(os.path.join(DOWNLOAD_PATH, f"downloaded_{filename}"), 'wb') as f:
+        with open(os.path.join(Peer1.DOWNLOAD_PATH, f"downloaded_{filename}"), 'wb') as f:
             for chunk in response:
                 f.write(chunk.content)
         print(f"Archivo {filename} descargado exitosamente.")

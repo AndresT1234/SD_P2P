@@ -2,19 +2,24 @@ import grpc
 from concurrent import futures
 import sys
 import os
+import json
 
 # Agregar el directorio padre al path para importar los módulos de gRPC
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from gRPC import peer_pb2, peer_pb2_grpc
 
-FILES_PATH = "files/"  # Directorio donde se almacenan los archivos
 
 # Clase que implementa los métodos de PeerService
 class PeerService(peer_pb2_grpc.PeerServiceServicer):
-    def __init__(self):
-        self.files = os.listdir(FILES_PATH)  # Lista de archivos disponibles en el peer
+    FILES_PATH = "" # Directorio donde se almacenan los archivos
 
+    def __init__(self):
+        with open("config.json") as f:
+            data = json.load(f)
+            self.files = os.listdir(data['files_path'])  # Lista de archivos disponibles en el peer
+            PeerService.FILES_PATH = data['files_path']
+        
     # Método para manejar la solicitud de subida de archivos
     def UploadFile(self, request, context):
         filename = request.filename
@@ -27,7 +32,7 @@ class PeerService(peer_pb2_grpc.PeerServiceServicer):
     # Método para manejar la solicitud de descarga de archivos
     def DownloadFile(self, request, context):
         filename = request.filename
-        filepath = os.path.join(FILES_PATH, filename)
+        filepath = os.path.join(PeerService.FILES_PATH, filename)
         if os.path.exists(filepath):
             with open(filepath, 'rb') as file:
                 while chunk := file.read(1024):  # Leer el archivo en chunks de 1 KB
@@ -43,7 +48,7 @@ def serve():
     server.add_insecure_port('[::]:5003')  # Escuchar en el puerto 5001
     server.start()
     print("gRPC Peer Server ejecutandose en el puerto 5003...")
-    print(f"Archivos listos desde: {os.path.abspath(FILES_PATH)}")
+    print(f"Archivos listos desde: {os.path.abspath(PeerService.FILES_PATH)}")
     server.wait_for_termination()
 
 if __name__ == '__main__':

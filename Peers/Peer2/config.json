@@ -5,5 +5,6 @@
     "port": "5002",
     "archivos": "file1.txt,fil2.txt,f22.txt",
     "api_url": "http://localhost:5000",
-    "files_path": "files/"
+    "files_path": "files/",
+    "files_path_download": "files/"
 }
