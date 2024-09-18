@@ -21,7 +21,7 @@ class PeerService(peer_pb2_grpc.PeerServiceServicer):
             PeerService.FILES_PATH = data['files_path']
         
     # Método para manejar la solicitud de subida de archivos
-    def UploadFile(self, request, context):
+    def UploadFile(self, request):
         filename = request.filename
         # Implementación para manejar la carga del archivo
         if filename in self.files:

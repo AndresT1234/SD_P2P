@@ -34,7 +34,7 @@ def login():
 
 
 # Endpoint para index
-@app.route('/index', methods=['POST'])
+@app.route('/index', methods=['GET'])
 def index():
     data = request.get_json()
     ip = data.get('ip')
@@ -56,7 +56,7 @@ def index():
         return jsonify({"error": "Peer no encontrado"}), 404
 
 # Endpoint para search
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['GET'])
 def search():
     data = request.get_json()
     archivo_buscado = data.get('archivo')

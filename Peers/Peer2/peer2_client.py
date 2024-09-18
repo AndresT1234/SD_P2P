@@ -38,7 +38,7 @@ class Peer2:
         if not ip or not url or not api_url:
             return {"error": "Faltan datos (ip, url o api_url)"}, 400
 
-        response = requests.post(f"{api_url}/index", json={"ip": ip, "url": url})
+        response = requests.get(f"{api_url}/index", json={"ip": ip, "url": url})
 
         if response.status_code == 200:
             response = response.json()
@@ -53,7 +53,7 @@ class Peer2:
         if not api_url:
             return {"error": "Falta la url del api"}, 400
 
-        response = requests.post(f"{api_url}/search", json={"archivo": archivo_buscado})
+        response = requests.get(f"{api_url}/search", json={"archivo": archivo_buscado})
 
         if response.status_code == 200:
             response = response.json()
@@ -106,7 +106,7 @@ def load_files():
         port = data['port']
         api_url = data['api_url']
     
-    response = requests.post(f"{api_url}/loadfiles", json={"ip": ip, "port": port, "archivos": files})
+    response = requests.put(f"{api_url}/loadfiles", json={"ip": ip, "port": port, "archivos": files})
         
     if response.status_code == 200:
             return {"estado": "OK", "message": "archivos cargados correctamente"}, 200
