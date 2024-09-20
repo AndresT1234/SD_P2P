@@ -8,7 +8,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from gRPC import peer_pb2, peer_pb2_grpc
 
-
 class Peer1:
     DOWNLOAD_PATH = "" # Directorio donde se almacenan los archivos descargados
 
@@ -61,12 +60,13 @@ class Peer1:
         else:
             return {"error": "No se encontraron resultados"}, 404
     
+    
 
-    def logout(self, url, api_url):
-        if not url or not api_url:
+    def logout(self, ip, url, api_url):
+        if not ip or not url or not api_url:
             return {"error": "Faltan datos (url o api_url)"}, 400
 
-        response = requests.post(f"{api_url}/logout", json={"url": url})
+        response = requests.post(f"{api_url}/logout", json={"ip":ip,"url": url})
 
         if response.status_code == 200:
             response = response.json()
@@ -136,7 +136,7 @@ def main():
         print("Index response:", index_response)
     
     elif parametro1 == "/logout":
-        logout_response = peer.logout(f"http://{peer.ip}:{peer.port}", peer.api_url)
+        logout_response = peer.logout(peer.ip, f"http://{peer.ip}:{peer.port}", peer.api_url)
         print("Logout response:", logout_response)
     
     elif parametro1 == "/search":

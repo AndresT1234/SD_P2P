@@ -75,11 +75,12 @@ def search():
 def logout():
     data = request.get_json()
     url = data.get('url')
+    ip = data.get('ip')
 
-    if not url:
-        return jsonify({"error": "Faltan datos (url)"}), 400
+    if not url or not ip:
+        return jsonify({"error": "Faltan datos (ip o url)"}), 400
 
-    peer_key = (url)
+    peer_key = (url, ip)
 
     if peer_key in peers:
         del peers[peer_key]
