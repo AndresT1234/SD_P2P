@@ -37,21 +37,25 @@ def login():
 @app.route('/index', methods=['GET'])
 def index():
     data = request.get_json()
-    url = data.get('url')
+    ip = data.get('ip')
+    port = data.get('port')
 
-    if url not in peers:
+    full_url = f"http://{ip}:{port}"    
+    peer_key = (full_url,ip)
+
+    if peer_key not in peers:
         
-        logging.info(f"Peer no está conectado: {url}")
-        return jsonify({"mensaje": f"Peer {url} NO se encuentra conectado en la red."}), 400
-    else:
-        all_files = []
-        for peer in peers.values():
-            all_files.extend(peer.get("files", []))
+        logging.info(f"Peer no está conectado: {full_url}")
+        return jsonify({"mensaje": f"Peer {peer_key} NO se encuentra conectado en la red."}), 400
+    
+    all_files = []
+    for peer in peers.values():
+        all_files.extend(peer.get("files", []))
 
-        if all_files:
-            return jsonify({"files": all_files}), 200
-        else:
-            return jsonify({"error": "No hay archivos"}), 404
+    if all_files:
+        return jsonify({"files": all_files}), 200
+    else:
+        return jsonify({"error": "No hay archivos"}), 404
     
 
 # Endpoint para search
@@ -81,13 +85,15 @@ def search():
 @app.route('/logout', methods=['POST'])
 def logout():
     data = request.get_json()
-    url = data.get('url')
+    port = data.get('port')
     ip = data.get('ip')
 
-    if not url or not ip:
-        return jsonify({"error": "Faltan datos (ip o url)"}), 400
+    full_url = f"http://{ip}:{port}"    
+    peer_key = (full_url,ip)
 
-    peer_key = (url, ip)
+    if not port or not ip:
+        return jsonify({"error": "Faltan datos (ip o port)"}), 400
+
 
     if peer_key in peers:
         del peers[peer_key]

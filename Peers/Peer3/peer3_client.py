@@ -34,17 +34,17 @@ class Peer3:
             return response.json(), response.status_code
         
 
-    def index(self, api_url, url):
-        if not api_url:
-            return {"error": "Faltan datos  api_url"}, 400
+    def index(self, api_url, ip, port):
+        if not api_url or not ip or not port:
+            return {"error": "Faltan datos  (api_url o ip o port)"}, 400
 
-        response = requests.get(f"{api_url}/index", json={"url": url})
+        response = requests.get(f"{api_url}/index", json={"ip": ip, "port": port})
 
         if response.status_code == 200:
             response = response.json()
             return response, 200
         elif response.status_code == 400:
-            return  {"mensaje": f"Peer {url} NO se encuentra conectado en la red."}, 400
+            return  {"mensaje": f"Peer {ip}:{port} NO se encuentra conectado en la red."}, 400
         else:
             return {"error": "No hay archivos"}, 404
 
@@ -64,11 +64,11 @@ class Peer3:
             return {"error": "No se encontraron resultados"}, 404
     
 
-    def logout(self, ip, url, api_url):
-        if not ip or not url or not api_url:
+    def logout(self, ip, port, api_url):
+        if not ip or not port or not api_url:
             return {"error": "Faltan datos (url o api_url)"}, 400
 
-        response = requests.post(f"{api_url}/logout", json={"ip":ip,"url": url})
+        response = requests.post(f"{api_url}/logout", json={"ip":ip,"port": port})
 
         if response.status_code == 200:
             response = response.json()
@@ -133,11 +133,11 @@ def main():
         print("Login response:", login_response)
 
     elif parametro1 == "/index":
-        index_response = peer.index(peer.api_url,f"http://{peer.ip}:{peer.port}")
+        index_response = peer.index(peer.api_url,peer.ip,peer.port)
         print("Index response:", index_response)
     
     elif parametro1 == "/logout":
-        logout_response = peer.logout(peer.ip, f"http://{peer.ip}:{peer.port}", peer.api_url)
+        logout_response = peer.logout(peer.ip, peer.port, peer.api_url)
         print("Logout response:", logout_response)
     
     elif parametro1 == "/search":
