@@ -36,24 +36,16 @@ def login():
 # Endpoint para index
 @app.route('/index', methods=['GET'])
 def index():
-    data = request.get_json()
-    url = data.get('url')
-    ip = data.get('ip')
 
-    if not url or not ip:
-        return jsonify({"error": "Faltan datos (ip o url)"}), 400
+    all_files = []
+    for peer in peers.values():
+        all_files.extend(peer.get("files", []))
 
-    peer_key = (url, ip)
-    peer_info = peers.get(peer_key)
-
-    if peer_info:
-        response = {
-            "nombre": peer_info.get("user"),
-            "files": peer_info.get("files", [])
-        }
-        return jsonify(response), 200
+    if all_files:
+        return jsonify({"files": all_files}), 200
     else:
-        return jsonify({"error": "Peer no encontrado"}), 404
+        return jsonify({"error": "No hay archivos"}), 404
+    
 
 # Endpoint para search
 @app.route('/search', methods=['GET'])
@@ -82,13 +74,12 @@ def search():
 @app.route('/logout', methods=['POST'])
 def logout():
     data = request.get_json()
-    ip = data.get('ip')
     url = data.get('url')
 
-    if not ip or not url:
-        return jsonify({"error": "Faltan datos (ip o url)"}), 400
+    if not url:
+        return jsonify({"error": "Faltan datos (url)"}), 400
 
-    peer_key = (url, ip)
+    peer_key = (url)
 
     if peer_key in peers:
         del peers[peer_key]
