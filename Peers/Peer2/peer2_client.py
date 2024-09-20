@@ -151,6 +151,11 @@ def main():
 
         download_file(peer_address, filename)
 
+    elif parametro1 == "/loadfiles":
+        responseLoadFiles = load_files()
+
+        print("Load Response:", responseLoadFiles)
+
     #En caso de que el comando no exista
     else:
         print("Error en el comando")
