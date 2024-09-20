@@ -36,15 +36,22 @@ def login():
 # Endpoint para index
 @app.route('/index', methods=['GET'])
 def index():
+    data = request.get_json()
+    url = data.get('url')
 
-    all_files = []
-    for peer in peers.values():
-        all_files.extend(peer.get("files", []))
-
-    if all_files:
-        return jsonify({"files": all_files}), 200
+    if url not in peers:
+        
+        logging.info(f"Peer no está conectado: {url}")
+        return jsonify({"mensaje": f"Peer {url} NO se encuentra conectado en la red."}), 400
     else:
-        return jsonify({"error": "No hay archivos"}), 404
+        all_files = []
+        for peer in peers.values():
+            all_files.extend(peer.get("files", []))
+
+        if all_files:
+            return jsonify({"files": all_files}), 200
+        else:
+            return jsonify({"error": "No hay archivos"}), 404
     
 
 # Endpoint para search

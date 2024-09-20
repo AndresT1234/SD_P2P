@@ -34,15 +34,17 @@ class Peer4:
             return response.json(), response.status_code
         
 
-    def index(self, api_url):
+    def index(self, api_url, url):
         if not api_url:
             return {"error": "Faltan datos  api_url"}, 400
 
-        response = requests.get(f"{api_url}/index")
+        response = requests.get(f"{api_url}/index", json={"url": url})
 
         if response.status_code == 200:
             response = response.json()
             return response, 200
+        elif response.status_code == 400:
+            return  {"mensaje": f"Peer {url} NO se encuentra conectado en la red."}, 400
         else:
             return {"error": "No hay archivos"}, 404
 
@@ -131,7 +133,7 @@ def main():
         print("Login response:", login_response)
 
     elif parametro1 == "/index":
-        index_response = peer.index(peer.api_url)
+        index_response = peer.index(peer.api_url,f"http://{peer.ip}:{peer.port}")
         print("Index response:", index_response)
     
     elif parametro1 == "/logout":
