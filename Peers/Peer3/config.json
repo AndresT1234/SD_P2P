@@ -3,7 +3,6 @@
     "password": "peer3333",
     "ip": "127.0.0.3",
     "port": "5003",
-    "archivos": "file2.txt,file1.txt,fi33.txt",
     "api_url": "http://localhost:5000",
     "files_path": "files/",
     "files_path_download": "files/"
