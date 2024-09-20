@@ -115,7 +115,7 @@ def load_files():
 
 
 def main():
-    peer = 4()
+    peer = Peer4()
 
     #Verificamos que se haya pasado un parametro
     if len(sys.argv) < 1:
