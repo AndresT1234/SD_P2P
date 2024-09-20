@@ -20,7 +20,7 @@ def login():
 
     full_url = f"http://{ip}:{port}"
     token = secrets.token_urlsafe(6)
-    peer_key = (full_url)
+    peer_key = (full_url,ip)
 
     if peer_key in peers:
         logging.info(f"Peer ya se encuentra conectado: {full_url}")
@@ -38,11 +38,13 @@ def login():
 def index():
     data = request.get_json()
     url = data.get('url')
+    ip = data.get('ip')
 
-    if not url:
-        return jsonify({"error": "Faltan datos en la url"}), 400
+    if not url or not ip:
+        return jsonify({"error": "Faltan datos (ip o url)"}), 400
 
-    peer_info = peers.get(url)
+    peer_key = (url, ip)
+    peer_info = peers.get(peer_key)
 
     if peer_info:
         response = {
@@ -63,13 +65,13 @@ def search():
         return jsonify({"error": "Falta el nombre del archivo a buscar"}), 400
     
     resultados = []
-    for url , info in peers.items():
+    for (url,ip) , info in peers.items():
         archivos = info.get("files", [])
         for archivo in archivos:
             files_string = ','.join(archivo)
             archivos_list = files_string.split(',')
             if archivo_buscado in archivos_list:
-                resultados.append({"url": url, "nombre": info.get("user")})
+                resultados.append({"url": url,"ip":ip, "nombre": info.get("user")})
     
     if resultados:
         return jsonify({"peers": resultados}), 200
