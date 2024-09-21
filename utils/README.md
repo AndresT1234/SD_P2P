@@ -49,9 +49,9 @@ Antes de ejecutar el sistema, es necesario instalar las dependencias y compilar 
    pip install grpcio-tools
    ```
 
-2. Compilar el archivo `catalog.proto` para generar los archivos Python necesarios:
+2. Compilar el archivo `peer.proto` para generar los archivos Python necesarios:
    ```bash
-   python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. catalog.proto
+   python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. peer.proto
    ```
 
    Este comando generará los siguientes archivos:
@@ -84,7 +84,7 @@ El proyecto utiliza los siguientes módulos y dependencias clave:
 --------------Servidor gRPC----------------------------
 ### Función para iniciar el servidor gRPC
 
-- `server()`: Inicia el servidor gRPC y expone los servicios definidos en `catalog.proto`. Este método configura y ejecuta el servidor para que pueda recibir y manejar solicitudes gRPC.
+- `server()`: Inicia el servidor gRPC y expone los servicios definidos en `peer.proto`. Este método configura y ejecuta el servidor para que pueda recibir y manejar solicitudes gRPC.
 
 
 #### API REST
